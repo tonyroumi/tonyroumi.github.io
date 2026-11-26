@@ -551,6 +551,15 @@ footer {
   margin-bottom: 22px;
 }
 
+/* Diagram image at its natural aspect ratio */
+.paper-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
 /* 16:9 frame for a single video, image or iframe */
 .paper-media {
   width: 100%;

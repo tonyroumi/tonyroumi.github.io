@@ -7,6 +7,10 @@
   <title>Humanoid Motion Learning Framework — Anthony Roumi</title>
   <link rel="stylesheet" href="../style.css" />
   <script src="../theme.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
   <style>
     hr { margin-bottom: 34px; }
     h2 { margin-top: 46px; }
@@ -18,7 +22,7 @@
     <a class="back-link" href="../index.html">Anthony Roumi</a>
 
     <header class="paper-header">
-      <h1>Learning Stylistic Humanoid Motions</h1>
+      <h1>Learning and Composing Stylistic Humanoid Behaviors</h1>
       <br>
       <nav class="paper-links" aria-label="Project resources">
         <a href="https://github.com/tonyroumi/move-it-move-it">
@@ -34,31 +38,56 @@
 
     <section class="project-overview" id="overview">
       <p>
-        This project explores learning stylistic humanoid motions using reinforcement learning, drawing on ideas from
+        This project explores how reference motions can be used to learn and compose task-driven behaviors on a humanoid robot within a single policy. 
+        Building on
         <a href="https://arxiv.org/abs/2104.02180" target="_blank" rel="noopener noreferrer">Adversarial Motion Priors</a>
         and
-        <a href="https://arxiv.org/abs/1804.02717" target="_blank" rel="noopener noreferrer">DeepMimic</a>.
+        <a href="https://arxiv.org/abs/1804.02717" target="_blank" rel="noopener noreferrer">DeepMimic</a>, 
+        I developed a reinforcement learning framework in IsaacLab that combines adversarial imitation, explicit motion tracking, 
+        and task-specific objectives. 
+      </p>
+      <p>
+        The framework supports continuous task commands, discrete behavior triggers, and motion-phase conditioning, 
+        allowing transitions to be learned between steady-state motions (e.g., locomotion) and dynamically triggered motions. 
       </p>
     </section>
 
     <section class="project-demo" id="video">
-      <div class="demo-heading">
-        <h3>Locomotion</h3>
+    <div class="hero-comparison refs-2">
+      <div class="hero-panel">
+        <video src="../assets/humanoid_jump.mp4" autoplay muted loop playsinline></video>
+        <span class="hero-label">Learned Policy</span>
       </div>
-
-      <div class="hero-comparison">
-        <div class="hero-panel">
-          <video src="../assets/humanoid_walk_hero.mp4" autoplay muted loop playsinline></video>
-          <span class="hero-label">Learned Policy</span>
-        </div>
+      <div class="hero-refs">
         <div class="hero-panel">
           <video src="../assets/walk.mp4" autoplay muted loop playsinline></video>
-          <span class="hero-label">Reference Motion</span>
+          <span class="hero-label">Walk</span>
+        </div>
+        <div class="hero-panel">
+          <video src="../assets/jump.mp4" autoplay muted loop playsinline></video>
+          <span class="hero-label">Jump</span>
         </div>
       </div>
+    </div>
     </section>
 
-    <h2 id="framework">Overview</h2>
+    <h2 id="framework">Methodology</h2>
+    <p> A single policy is conditioned on proprioceptive observations, 
+      continuous task commands, discrete behavior signals,
+      and a motion phase. </p>
+    <p class="math-display">\[ a_t \sim \pi_\theta(\cdot \mid s_t, c_t, b_t, \phi_t) \]</p>
+    <br>
+    <p>
+      Different motions receive different weighted rewards.
+     </p>
+    <p class="math-display">\[ r_t = r_{\text{task}}^{(b_t)} + \lambda_{\text{track}}^{(b_t)} r_{\text{track}} + \lambda_{\text{AMP}}^{(b_t)} r_{\text{AMP}}\]</p>
+    <br>
+    <p> Behaviors are triggered mid episode, then return to steady-state.</p>
+    <figure class="paper-figure">
+      <img class="paper-diagram" src="../assets/trigger.png" alt="Behavior trigger diagram" />
+    </figure>
+    </p>
+    <h2>Framework</h2>
     <p>
       A manifest defines which motion clips to sample from and their respective environment configuration.
     </p>
@@ -108,20 +137,13 @@
       unhealthy:
       deviation_from_motion:
         threshold: 3.0</code></pre>
-    <br />
-    <p>
-      The environment then produces motion specific <b>commands</b>, <b>triggers</b>, <b>rewards</b>, and <b>terminations</b>.
-    </p>
-    <p>
-      Episodes can initialize from any reference motion, execute triggers mid-episode, and transition back to steady-state behavior.
-    </p>
 
     <h2 id="experiments">Experiments</h2>
     <p>
       The exact configurations can be found <a href="https://github.com/tonyroumi/move-it-move-it/tree/main/configs">here</a>.
     </p>
 
-    <h3>Locomotion with Two Dance Moves</h3>
+    <h3>Stylistic Locomotion with Triggered Dance Behaviors</h3>
     <div class="hero-comparison refs-3">
       <div class="hero-panel">
         <video src="../assets/humanoid_dance.mp4" autoplay muted loop playsinline></video>
@@ -142,26 +164,7 @@
         </div>
       </div>
     </div>
-
-    <br />
-
-    <h3>Locomotion with Jump</h3>
-    <div class="hero-comparison refs-2">
-      <div class="hero-panel">
-        <video src="../assets/humanoid_jump.mp4" autoplay muted loop playsinline></video>
-        <span class="hero-label">Learned Policy</span>
-      </div>
-      <div class="hero-refs">
-        <div class="hero-panel">
-          <video src="../assets/walk.mp4" autoplay muted loop playsinline></video>
-          <span class="hero-label">Walk</span>
-        </div>
-        <div class="hero-panel">
-          <video src="../assets/jump.mp4" autoplay muted loop playsinline></video>
-          <span class="hero-label">Jump</span>
-        </div>
-      </div>
-    </div>
+    <br>
 
     <footer>
       <span>&copy; <span id="year"></span> Anthony Roumi.</span> <span>Site design inspired by <a href="https://www.nicklashansen.com/" target="_blank" rel="noopener noreferrer">Nicklas Hansen</a>.</span>
